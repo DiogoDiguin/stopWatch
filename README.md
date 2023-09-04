@@ -17,4 +17,4 @@ samples, guidance on mobile development, and a full API reference.
 
 - Credits:
   Build a Stopwatch App With Flutter by doctor code
-  (https://www.youtube.com/watch?v=iI-BR-fr0bQ)
+  https://www.youtube.com/watch?v=iI-BR-fr0bQ
