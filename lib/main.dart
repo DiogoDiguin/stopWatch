@@ -7,12 +7,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'StopWatch',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+      ),
       home: HomeApp(),
     );
   }
@@ -27,21 +31,82 @@ class HomeApp extends StatefulWidget {
 
 class _HomeAppState extends State<HomeApp> {
   //business logic of the app
-  int seconds = 0, minutes = 0, hours = 0;
-  String digitSeconds = "00", digitMinutes = "00", digitHours = "00";
+  int seconds = 0, minutes = 0, milliseconds = 0;
+  String digitSeconds = "00", digitMinutes = "00", digitMilliseconds = "00";
   Timer? timer;
   bool started = false;
-  List laps = [];
+  List<String> laps = [];
 
   //Stop timer FUNCTION
-  void stop(){
+  void stop() {
     timer!.cancel();
+    setState(() {
+      started = false;
+    });
+  }
+
+  //RESET timer FUNCTION
+  void reset() {
+    timer!.cancel();
+    setState(() {
+      seconds = 0;
+      minutes = 0;
+      milliseconds = 0;
+
+      digitSeconds = "00";
+      digitMinutes = "00";
+      digitMilliseconds = "00";
+
+      started = false;
+      laps.clear();
+    });
+  }
+
+  void addLaps() {
+    String lap = "$digitMinutes:$digitSeconds.$digitMilliseconds";
+
+    setState(() {
+      laps.add(lap);
+    });
+  }
+
+  //START timer FUNCTION
+  void start() {
+    started = true;
+    timer = Timer.periodic(Duration(milliseconds: 99), (timer) {
+      int localMinutes = minutes;
+      int localSeconds = seconds;
+      int localMilliseconds = milliseconds + 10;
+
+      if (localMilliseconds > 999) {
+        if (localSeconds > 59) {
+          localMinutes++;
+          localSeconds = 0;
+        } else {
+          localSeconds++;
+        }
+        localMilliseconds = 0;
+      }
+      setState(() {
+        seconds = localSeconds;
+        minutes = localMinutes;
+        milliseconds = localMilliseconds;
+
+        digitSeconds = (seconds >= 10) ? "$seconds" : "0$seconds";
+        digitMilliseconds = (milliseconds >= 99)
+            ? "${milliseconds ~/ 10}"
+            : (milliseconds >= 10)
+                ? "0${milliseconds ~/ 10}"
+                : "00${milliseconds ~/ 10}";
+        digitMinutes = (minutes >= 10) ? "$minutes" : "0$minutes";
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2757),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -63,20 +128,48 @@ class _HomeAppState extends State<HomeApp> {
                 height: 20.0,
               ),
               Center(
-                child: Text("00:00:00",
+                child: Text("$digitMinutes:$digitSeconds.$digitMilliseconds",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 82.0,
+                      color: Colors.white,
+                      fontSize: 82.0,
                       fontWeight: FontWeight.w600,
                     )),
               ),
               Container(
-                height: 400.0,
-                decoration: BoxDecoration(
-                  color: Color(0xFF323F68),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
+                  height: 400.0,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  //listBuilder
+                  child: ListView.builder(
+                    itemCount: laps.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Lap nº${index + 1}",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            Text(
+                              "${laps[index]}",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ) //,
+                  ),
               SizedBox(
                 height: 20.0,
               ),
@@ -85,12 +178,16 @@ class _HomeAppState extends State<HomeApp> {
                 children: [
                   Expanded(
                     child: RawMaterialButton(
-                      onPressed: () {},
-                      shape: const StadiumBorder(
-                        side: BorderSide(color: Colors.blue),
+                      onPressed: () {
+                        (!started) ? start() : stop();
+                      },
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                       child: Text(
-                        "Start",
+                        (!started) ? "Start" : "Pause",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -100,7 +197,9 @@ class _HomeAppState extends State<HomeApp> {
                   ),
                   IconButton(
                     color: Colors.white,
-                    onPressed: () {},
+                    onPressed: () {
+                      addLaps();
+                    },
                     icon: Icon(Icons.flag),
                   ),
                   SizedBox(
@@ -108,12 +207,14 @@ class _HomeAppState extends State<HomeApp> {
                   ),
                   Expanded(
                     child: RawMaterialButton(
-                      onPressed: () {},
-                      fillColor: Colors.blue,
+                      onPressed: () {
+                        reset();
+                      },
+                      fillColor: Theme.of(context).colorScheme.onPrimary,
                       shape: const StadiumBorder(),
                       child: Text(
                         "Reset",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
                       ),
                     ),
                   ),
