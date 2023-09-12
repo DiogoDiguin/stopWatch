@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,14 +29,12 @@ class HomeApp extends StatefulWidget {
 }
 
 class _HomeAppState extends State<HomeApp> {
-  //business logic of the app
   int seconds = 0, minutes = 0, milliseconds = 0;
   String digitSeconds = "00", digitMinutes = "00", digitMilliseconds = "00";
   Timer? timer;
   bool started = false;
   List<String> laps = [];
 
-  //Stop timer FUNCTION
   void stop() {
     timer!.cancel();
     setState(() {
@@ -45,7 +42,6 @@ class _HomeAppState extends State<HomeApp> {
     });
   }
 
-  //RESET timer FUNCTION
   void reset() {
     timer!.cancel();
     setState(() {
@@ -70,7 +66,6 @@ class _HomeAppState extends State<HomeApp> {
     });
   }
 
-  //START timer FUNCTION
   void start() {
     started = true;
     timer = Timer.periodic(Duration(milliseconds: 99), (timer) {
@@ -96,8 +91,8 @@ class _HomeAppState extends State<HomeApp> {
         digitMilliseconds = (milliseconds >= 99)
             ? "${milliseconds ~/ 10}"
             : (milliseconds >= 10)
-                ? "0${milliseconds ~/ 10}"
-                : "00${milliseconds ~/ 10}";
+            ? "0${milliseconds ~/ 10}"
+            : "00${milliseconds ~/ 10}";
         digitMinutes = (minutes >= 10) ? "$minutes" : "0$minutes";
       });
     });
@@ -108,40 +103,40 @@ class _HomeAppState extends State<HomeApp> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(
-                  "StopWatch App",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Center(
-                child: Text("$digitMinutes:$digitSeconds.$digitMilliseconds",
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    "StopWatch App",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 82.0,
-                      fontWeight: FontWeight.w600,
-                    )),
-              ),
-              Container(
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                Center(
+                  child: Text("$digitMinutes:$digitSeconds.$digitMilliseconds",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 82.0,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ),
+                Container(
                   height: 400.0,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  //listBuilder
                   child: ListView.builder(
                     itemCount: laps.length,
                     itemBuilder: (context, index) {
@@ -168,59 +163,61 @@ class _HomeAppState extends State<HomeApp> {
                         ),
                       );
                     },
-                  ) //,
                   ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: RawMaterialButton(
-                      onPressed: () {
-                        (!started) ? start() : stop();
-                      },
-                      shape: StadiumBorder(
-                        side: BorderSide(
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: RawMaterialButton(
+                        onPressed: () {
+                          (!started) ? start() : stop();
+                        },
+                        shape: StadiumBorder(
+                          side: BorderSide(
                             color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                        child: Text(
+                          (!started) ? "Start" : "Pause",
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      child: Text(
-                        (!started) ? "Start" : "Pause",
-                        style: TextStyle(color: Colors.white),
-                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 8.0,
-                  ),
-                  IconButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      addLaps();
-                    },
-                    icon: Icon(Icons.flag),
-                  ),
-                  SizedBox(
-                    width: 8.0,
-                  ),
-                  Expanded(
-                    child: RawMaterialButton(
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    IconButton(
+                      color: Colors.white,
                       onPressed: () {
-                        reset();
+                        addLaps();
                       },
-                      fillColor: Theme.of(context).colorScheme.onPrimary,
-                      shape: const StadiumBorder(),
-                      child: Text(
-                        "Reset",
-                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                      icon: Icon(Icons.flag),
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    Expanded(
+                      child: RawMaterialButton(
+                        onPressed: () {
+                          reset();
+                        },
+                        fillColor: Theme.of(context).colorScheme.onPrimary,
+                        shape: const StadiumBorder(),
+                        child: Text(
+                          "Reset",
+                          style:
+                          TextStyle(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
